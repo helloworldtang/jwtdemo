@@ -1,6 +1,7 @@
 package org.zerhusen.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -28,6 +29,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Value("${jwt.route.authentication.path}")
+    private String authPath;
 
     @Autowired
     public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -70,10 +74,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-                .antMatchers("/auth/**").permitAll()
+//                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/" + authPath + "/**").permitAll()
                 .anyRequest().authenticated();
 
-        // Custom JWT based security filter
+        // Custom JWT based security filterF
         httpSecurity
                 .addFilterBefore(authenticationTokenFilterBean(), UsernamePasswordAuthenticationFilter.class);
 
