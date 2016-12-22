@@ -1,5 +1,7 @@
 package org.zerhusen.security.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class AuthenticationRestController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationRestController.class);
+
     @Value("${jwt.header}")
     private String tokenHeader;
 
@@ -41,18 +45,19 @@ public class AuthenticationRestController {
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtAuthenticationRequest authenticationRequest, Device device) throws AuthenticationException {
 
         // Perform the security
+        String username = authenticationRequest.getUsername();
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.getUsername(),
+                        username,
                         authenticationRequest.getPassword()
                 )
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Reload password post-security so we can generate token
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         final String token = jwtTokenUtil.generateToken(userDetails, device);
-
+        LOGGER.info("username:{},token:{}", username, token);
         // Return the token
         return ResponseEntity.ok(new JwtAuthenticationResponse(token));
     }

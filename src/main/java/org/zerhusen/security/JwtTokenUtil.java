@@ -3,7 +3,10 @@ package org.zerhusen.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.mobile.device.Device;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -14,9 +17,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@ConfigurationProperties(prefix = "jwt")
 public class JwtTokenUtil implements Serializable {
 
     private static final long serialVersionUID = -3301605591108950415L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtTokenUtil.class);
 
     static final String CLAIM_KEY_USERNAME = "sub";
     static final String CLAIM_KEY_AUDIENCE = "audience";
@@ -27,10 +32,10 @@ public class JwtTokenUtil implements Serializable {
     private static final String AUDIENCE_MOBILE = "mobile";
     private static final String AUDIENCE_TABLET = "tablet";
 
-    @Value("${jwt.secret}")
+    @Value("${secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
+    @Value("${expiration}")
     private Long expiration;
 
     public String getUsernameFromToken(String token) {
@@ -124,7 +129,9 @@ public class JwtTokenUtil implements Serializable {
         Map<String, Object> claims = new HashMap<>();
         claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
         claims.put(CLAIM_KEY_AUDIENCE, generateAudience(device));
-        claims.put(CLAIM_KEY_CREATED, new Date());
+        Date value = new Date();
+        LOGGER.info("{}:{},getTime():{}", CLAIM_KEY_CREATED, value, value.getTime());
+        claims.put(CLAIM_KEY_CREATED, value);
         return generateToken(claims);
     }
 

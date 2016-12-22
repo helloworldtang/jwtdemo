@@ -6,8 +6,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
 
-    private final Log logger = LogFactory.getLog(this.getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(JwtAuthenticationTokenFilter.class);
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -37,7 +37,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         // String authToken = header.substring(7);
         String username = jwtTokenUtil.getUsernameFromToken(authToken);
 
-        logger.info("checking authentication for user " + username);
+        LOGGER.info("checking authentication for user " + username);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -50,7 +50,7 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                logger.info("authenticated user " + username + ", setting security context");
+                LOGGER.info("authenticated user {}, setting security context", username);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
