@@ -32,11 +32,25 @@ public class JwtTokenUtil implements Serializable {
     private static final String AUDIENCE_MOBILE = "mobile";
     private static final String AUDIENCE_TABLET = "tablet";
 
-    @Value("${secret}")
     private String secret;
 
-    @Value("${expiration}")
     private Long expiration;
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public Long getExpiration() {
+        return expiration;
+    }
+
+    public void setExpiration(Long expiration) {
+        this.expiration = expiration;
+    }
 
     public String getUsernameFromToken(String token) {
         String username;
