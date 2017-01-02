@@ -18,8 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.zerhusen.security.JwtAuthenticationEntryPoint;
 import org.zerhusen.security.JwtAuthenticationTokenFilter;
 
-@SuppressWarnings("SpringJavaAutowiringInspection")
-@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -37,7 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureAuthentication(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
                 .userDetailsService(this.userDetailsService)
-                .passwordEncoder(passwordEncoder());
+                .passwordEncoder(new BCryptPasswordEncoder());
     }*/
 
     @Bean
@@ -85,11 +83,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js"
                 ).permitAll()
-//                .antMatchers("/auth/**").permitAll()
                 .antMatchers("/" + authPath + "/**").permitAll()
                 .anyRequest().authenticated();
 
-        // Custom JWT based security filterF
+        // Custom JWT based security filter
         /**
          * 每次请求过来时, 我们将获取请求的Authorization头部存有的jwt, 并提取相应的信息,
          * 如果当前security的上下文还没有认证对应的用户信息并且token是有效的,

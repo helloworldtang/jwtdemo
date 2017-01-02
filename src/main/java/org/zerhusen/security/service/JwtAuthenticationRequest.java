@@ -1,4 +1,4 @@
-package org.zerhusen.security;
+package org.zerhusen.security.service;
 
 import java.io.Serializable;
 
